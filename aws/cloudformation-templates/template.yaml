@@ -215,8 +215,8 @@ Parameters:
 
   ECSLaunchType:
     Type: String
-    Description: Choose if you want ECS to use Fargate or EC2 backed. If you're unsure, leave Fargate
-    AllowedValues:. You must select EC2 if you intend to use the service FIS for chaos engineering
+    Description: Choose if you want ECS to use Fargate or EC2 backed. If you're unsure, leave Fargate. You must select EC2 if you intend to use the service FIS for chaos engineering
+    AllowedValues:
       - "EC2"
       - "FARGATE"
     Default: "FARGATE"
