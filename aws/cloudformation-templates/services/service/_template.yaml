@@ -230,7 +230,7 @@ Resources:
         UserPoolClientId: !Ref UserPoolClientId
         IdentityPoolId: !Ref IdentityPoolId
         StackBucketName: !Ref StackBucketName
-        FargateServiceName: !GetAtt Service.Outputs.FargateServiceName
+        ECSServiceName: !GetAtt Service.Outputs.ECSServiceName
         ProductsServiceExternalUrl: !Ref ProductsServiceExternalUrl
         UsersServiceExternalUrl: !Ref UsersServiceExternalUrl
         CartsServiceExternalUrl: !Ref CartsServiceExternalUrl

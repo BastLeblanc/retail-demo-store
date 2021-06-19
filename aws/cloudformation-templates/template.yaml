@@ -213,6 +213,14 @@ Parameters:
     Description: Segment write key for real-time data collection (optional).
     NoEcho: true
 
+  ECSLaunchType:
+    Type: String
+    Description: Choose if you want ECS to use Fargate or EC2 backed. If you're unsure, leave Fargate
+    AllowedValues:. You must select EC2 if you intend to use the service FIS for chaos engineering
+      - "EC2"
+      - "FARGATE"
+    Default: "FARGATE"
+
 Resources:
   # Base Resources
   Base:
@@ -230,6 +238,7 @@ Resources:
         OptimizelySdkKey: !Ref OptimizelySdkKey
         SegmentWriteKey: !Ref SegmentWriteKey
         PinpointSMSLongCode: !Ref PinpointSMSLongCode
+        ECSLaunchType: !Ref ECSLaunchType
 
   # Services Resources
   Services:
@@ -268,6 +277,7 @@ Resources:
           - '${RootURL}/images/'
           - RootURL: !GetAtt Base.Outputs.WebUICDNURL
         ParentStackName: !Ref AWS::StackName
+        ECSLaunchType: !Ref ECSLaunchType
 
   # Web UI Pipeline
   WebUIPipeline:

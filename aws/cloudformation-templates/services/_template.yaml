@@ -124,6 +124,13 @@ Parameters:
     Type: String
     Description: Parent stack name
 
+  ECSLaunchType:
+    Type: String
+    AllowedValues:
+      - "EC2"
+      - "FARGATE"
+    Default: "FARGATE"
+
 Resources:
 
   ProductsService:
@@ -159,6 +166,7 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Sub ${ParentStackName}-${AWS::Region}
+        ECSLaunchType: !Ref ECSLaunchType
 
   UsersService:
     Type: AWS::CloudFormation::Stack
@@ -191,6 +199,7 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Sub ${ParentStackName}-${AWS::Region}
+        ECSLaunchType: !Ref ECSLaunchType
 
   CartsService:
     Type: AWS::CloudFormation::Stack
@@ -222,6 +231,7 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Sub ${ParentStackName}-${AWS::Region}
+        ECSLaunchType: !Ref ECSLaunchType
 
   OrdersService:
     Type: AWS::CloudFormation::Stack
@@ -253,6 +263,7 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Sub ${ParentStackName}-${AWS::Region}
+        ECSLaunchType: !Ref ECSLaunchType
 
   SearchService:
     Type: AWS::CloudFormation::Stack
@@ -285,6 +296,7 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Sub ${ParentStackName}-${AWS::Region}
+        ECSLaunchType: !Ref ECSLaunchType
 
   RecommendationsService:
     Type: AWS::CloudFormation::Stack
@@ -319,6 +331,7 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Sub ${ParentStackName}-${AWS::Region}
+        ECSLaunchType: !Ref ECSLaunchType
 
   VideosService:
     Type: AWS::CloudFormation::Stack
@@ -352,7 +365,8 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Sub ${ParentStackName}-${AWS::Region}
- 
+        ECSLaunchType: !Ref ECSLaunchType
+
   # Pinpoint personalized messaging customization
   PinpointPersonalize:
     Type: AWS::CloudFormation::Stack

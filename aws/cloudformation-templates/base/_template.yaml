@@ -61,6 +61,13 @@ Parameters:
     Type: String
     Description: Pinpoint SMS Long code.
 
+  ECSLaunchType:
+    Type: String
+    AllowedValues:
+      - "EC2"
+      - "FARGATE"
+    Default: "FARGATE"
+
 Resources:
 
   # Authentication
@@ -114,6 +121,11 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${ResourceBucket}/${ResourceBucketRelativePath}cloudformation-templates/base/ecs-cluster.yaml
+      Parameters:
+        ECSLaunchType: !Ref ECSLaunchType
+        VPC: !GetAtt VPC.Outputs.VpcId
+        PublicSubnetOne: !GetAtt VPC.Outputs.Subnet1
+        PublicSubnetTwo: !GetAtt VPC.Outputs.Subnet2
 
   # VPC
   VPC:
