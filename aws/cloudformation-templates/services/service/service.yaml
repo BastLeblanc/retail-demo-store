@@ -120,7 +120,7 @@ Parameters:
   PinpointAppId:
     Type: String
 
-  LaunchType:
+  ECSLaunchType:
     Type: String
     AllowedValues:
       - "EC2"
@@ -129,7 +129,7 @@ Parameters:
 Conditions:
 
   UseFargateCondition:
-    !Equals [!Ref LaunchType, 'FARGATE']
+    !Equals [!Ref ECSLaunchType, 'FARGATE']
 
 Resources:
   TaskExecutionRole:
@@ -292,7 +292,7 @@ Resources:
       Cluster: !Ref ClusterName
       DesiredCount: !Ref DesiredCount
       TaskDefinition: !Ref TaskDefinition
-      LaunchType: !Ref LaunchType
+      LaunchType: !Ref ECSLaunchType
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: !If [ UseFargateCondition, ENABLED, !Ref 'AWS::NoValue' ]
@@ -313,7 +313,7 @@ Resources:
     Properties:
       Family: !Sub ${AWS::StackName}-retaildemostore
       RequiresCompatibilities:
-         - !Ref LaunchType
+         - !Ref ECSLaunchType
       Memory: !Ref ContainerMemory
       Cpu: !Ref ContainerCpu
       NetworkMode: awsvpc
@@ -375,6 +375,9 @@ Resources:
               Value: 'RetailDemoStore-PersonalizePreCreateScheduledRule'
             - Name: PINPOINT_APP_ID
               Value: !Ref PinpointAppId
+            #Fix issue on ECS-EC2 "botocore.exceptions.NoRegionError: You must specify a region."
+            - Name: AWS_REGION
+              Value: !Ref AWS::Region
           PortMappings:
             - ContainerPort: 80
           LogConfiguration:

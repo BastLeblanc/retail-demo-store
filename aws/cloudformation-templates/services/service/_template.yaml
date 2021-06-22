@@ -202,6 +202,13 @@ Parameters:
   Uid:
     Type: String
 
+  ECSLaunchType:
+    Type: String
+    AllowedValues:
+      - "EC2"
+      - "FARGATE"
+    Default: "FARGATE"
+
 Resources:
 
   Loadbalancer:
@@ -282,7 +289,8 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Ref Uid
-        
+        ECSLaunchType: !Ref ECSLaunchType
+       
 Outputs:
   ServiceDNSName:
     Description: DNS name of the load balancer for this service

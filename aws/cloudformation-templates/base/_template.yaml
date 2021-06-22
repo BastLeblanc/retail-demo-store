@@ -68,6 +68,9 @@ Parameters:
       - "FARGATE"
     Default: "FARGATE"
 
+  ECSInstanceType:
+    Type: String
+
 Resources:
 
   # Authentication
@@ -123,10 +126,10 @@ Resources:
       TemplateURL: !Sub https://s3.amazonaws.com/${ResourceBucket}/${ResourceBucketRelativePath}cloudformation-templates/base/ecs-cluster.yaml
       Parameters:
         ECSLaunchType: !Ref ECSLaunchType
+        ECSInstanceType: !Ref ECSInstanceType
         VPC: !GetAtt VPC.Outputs.VpcId
         PublicSubnetOne: !GetAtt VPC.Outputs.Subnet1
         PublicSubnetTwo: !GetAtt VPC.Outputs.Subnet2
-
   # VPC
   VPC:
     Type: AWS::CloudFormation::Stack

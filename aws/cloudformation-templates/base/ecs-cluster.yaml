@@ -11,9 +11,9 @@ Parameters:
       - "EC2"
       - "FARGATE"
     Default: "FARGATE"
-  InstanceType:
+  ECSInstanceType:
     Type: String
-    Default: t2.micro
+    Default: m5.xlarge
     Description: Class of EC2 instance used to host containers. Choose t2 for testing, m5 for general purpose, c5 for CPU intensive services, and r5 for memory intensive services
     AllowedValues: [ t2.micro, t2.small, t2.medium, t2.large, t2.xlarge, t2.2xlarge,
      m5.large, m5.xlarge, m5.2xlarge, m5.4xlarge, m5.12xlarge, m5.24xlarge,
@@ -42,7 +42,7 @@ Parameters:
 Conditions:
 
   UseEC2Condition:
-    !Equals [!Ref LaunchType, 'EC2']
+    !Equals [!Ref ECSLaunchType, 'EC2']
 
 Resources:
 
@@ -84,7 +84,7 @@ Resources:
     Properties:
       ImageId: !Ref 'ECSAMI'
       SecurityGroups: [!Ref 'ContainerSecurityGroup']
-      InstanceType: !Ref 'InstanceType'
+      InstanceType: !Ref 'ECSInstanceType'
       IamInstanceProfile: !Ref 'EC2InstanceProfile'
       UserData:
         Fn::Base64: !Sub |
