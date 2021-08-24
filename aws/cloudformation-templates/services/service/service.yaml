@@ -74,14 +74,6 @@ Parameters:
     Type: String
     Default: 80
 
-  EnvOffersServiceInternalUrl:
-    Type: String
-    Default: offers.retaildemostore.local
-
-  EnvOffersServiceInternalPort:
-    Type: String
-    Default: 80
-
   EnvElasticsearchDomainEndpoint:
     Type: String
     Default: none
@@ -127,7 +119,18 @@ Parameters:
   
   PinpointAppId:
     Type: String
+
+  ECSLaunchType:
+    Type: String
+    AllowedValues:
+      - "EC2"
+      - "FARGATE"
     
+Conditions:
+
+  UseFargateCondition:
+    !Equals [!Ref ECSLaunchType, 'FARGATE']
+
 Resources:
   TaskExecutionRole:
     Type: AWS::IAM::Role
@@ -227,7 +230,7 @@ Resources:
                   - personalize:DeleteEventTracker
                   - personalize:DescribeEventTracker
                 Resource:
-                  - !Sub 'arn:aws:personalize:${AWS::Region}:${AWS::AccountId}:*/retaildemo*'
+                  - !Sub 'arn:aws:personalize:${AWS::Region}:${AWS::AccountId}:*/retaildemostore*'
               - Effect: Allow
                 Action:
                   - logs:CreateLogGroup
@@ -271,11 +274,6 @@ Resources:
                   - events:EnableRule
                 Resource:
                   - !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:rule/RetailDemoStore-PersonalizePreCreateScheduledRule'
-              - Effect: Allow
-                Action:
-                  - lambda:InvokeFunction
-                Resource:
-                  - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:AmazonPaySigningLambda'
 
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSCloudMapDiscoverInstanceAccess
@@ -286,16 +284,18 @@ Resources:
     Properties:
       LogGroupName: !Sub /ecs/${AWS::StackName}
 
-  FargateService:
+
+
+  ECSService:
     Type: AWS::ECS::Service
     Properties:
       Cluster: !Ref ClusterName
       DesiredCount: !Ref DesiredCount
       TaskDefinition: !Ref TaskDefinition
-      LaunchType: FARGATE
+      LaunchType: !Ref ECSLaunchType
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
+          AssignPublicIp: !If [ UseFargateCondition, ENABLED, !Ref 'AWS::NoValue' ]
           SecurityGroups:
             - !Ref SourceSecurityGroup
           Subnets: !Ref Subnets
@@ -313,7 +313,7 @@ Resources:
     Properties:
       Family: !Sub ${AWS::StackName}-retaildemostore
       RequiresCompatibilities:
-        - FARGATE
+         - !Ref ECSLaunchType
       Memory: !Ref ContainerMemory
       Cpu: !Ref ContainerCpu
       NetworkMode: awsvpc
@@ -351,10 +351,6 @@ Resources:
               Value: !Ref EnvSearchServiceInternalUrl
             - Name: SEARCH_SERVICE_PORT
               Value: '80'
-            - Name: OFFERS_SERVICE_HOST
-              Value: !Ref EnvOffersServiceInternalUrl
-            - Name: OFFERS_SERVICE_PORT
-              Value: '80'
             - Name: STACK_BUCKET
               Value: none
             - Name: RESOURCE_BUCKET
@@ -379,6 +375,9 @@ Resources:
               Value: 'RetailDemoStore-PersonalizePreCreateScheduledRule'
             - Name: PINPOINT_APP_ID
               Value: !Ref PinpointAppId
+            #Fix issue on ECS-EC2 "botocore.exceptions.NoRegionError: You must specify a region."
+            - Name: AWS_REGION
+              Value: !Ref AWS::Region
           PortMappings:
             - ContainerPort: 80
           LogConfiguration:
@@ -399,9 +398,9 @@ Resources:
         FailureThreshold: 1
 
 Outputs:
-  FargateServiceArn:
-    Value: !Ref FargateService
+  ECSServiceArn:
+    Value: !Ref ECSService
 
-  FargateServiceName:
-    Value: !GetAtt FargateService.Name
+  ECSServiceName:
+    Value: !GetAtt ECSService.Name
     

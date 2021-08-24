@@ -46,7 +46,7 @@ Parameters:
   ParentStackName:
     Type: String
     Description: Parent stack name
-
+  
   OptimizelySdkKey:
     Type: String
     Description: Optimizely SDK key for experimentation (optional).
@@ -56,18 +56,20 @@ Parameters:
     Type: String
     Description: Segment source write key (optional).
     NoEcho: true
-
+  
   PinpointSMSLongCode:
     Type: String
     Description: Pinpoint SMS Long code.
 
-  GoogleAnalyticsMeasurementId:
+  ECSLaunchType:
     Type: String
-    Description: Google Analytics Measurement Id (optional)
+    AllowedValues:
+      - "EC2"
+      - "FARGATE"
+    Default: "FARGATE"
 
-  LocationResourcePrefix:
+  ECSInstanceType:
     Type: String
-    Description: Prefix of Location Services resources to use
 
 Resources:
 
@@ -79,8 +81,7 @@ Resources:
       Parameters:
         AuthName: !Sub ${ParentStackName}-${AWS::Region}
         PinpointAppId: !GetAtt Pinpoint.Outputs.PinpointAppId
-        LocationResourcePrefix: !Ref LocationResourcePrefix
-
+        
   # Buckets
   Buckets:
     Type: AWS::CloudFormation::Stack
@@ -103,9 +104,7 @@ Resources:
         ExperimentStrategyTable: !GetAtt Tables.Outputs.ExperimentStrategyTable
         StackBucketName: !GetAtt Buckets.Outputs.StackBucketName
         Uid: !Sub ${ParentStackName}-${AWS::Region}
-        UserPoolId: !GetAtt Authentication.Outputs.UserPoolId
-        PinpointAppId: !GetAtt Pinpoint.Outputs.PinpointAppId
-
+        
   # Tables
   Tables:
     Type: AWS::CloudFormation::Stack
@@ -125,7 +124,12 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${ResourceBucket}/${ResourceBucketRelativePath}cloudformation-templates/base/ecs-cluster.yaml
-
+      Parameters:
+        ECSLaunchType: !Ref ECSLaunchType
+        ECSInstanceType: !Ref ECSInstanceType
+        VPC: !GetAtt VPC.Outputs.VpcId
+        PublicSubnetOne: !GetAtt VPC.Outputs.Subnet1
+        PublicSubnetTwo: !GetAtt VPC.Outputs.Subnet2
   # VPC
   VPC:
     Type: AWS::CloudFormation::Stack
@@ -147,17 +151,17 @@ Resources:
       AWSServiceName: es.amazonaws.com
       Description: 'Role for ES to access resources in VPC'
 
-  ElasticsearchRoleWaitHandle:
+  ElasticsearchRoleWaitHandle: 
     Condition: CreateElasticsearchServiceLinkedRole
     DependsOn: ElasticsearchServiceLinkedRole
     Type: AWS::CloudFormation::WaitConditionHandle
 
-  WaitHandle:
+  WaitHandle: 
     Type: AWS::CloudFormation::WaitConditionHandle
 
-  ElasticsearchRoleWaitCondition:
+  ElasticsearchRoleWaitCondition: 
     Type: AWS::CloudFormation::WaitCondition
-    Properties:
+    Properties: 
       Handle: !If [CreateElasticsearchServiceLinkedRole, !Ref ElasticsearchRoleWaitHandle, !Ref WaitHandle]
       Timeout: "1"
       Count: 0
@@ -184,7 +188,6 @@ Resources:
         OptimizelySdkKey: !Ref OptimizelySdkKey
         SegmentWriteKey: !Ref SegmentWriteKey
         PinpointSMSLongCode: !Ref PinpointSMSLongCode
-        GoogleAnalyticsMeasurementId: !Ref GoogleAnalyticsMeasurementId
 
   # CodeCommit Repository
   CodeCommitRepository:
@@ -214,11 +217,11 @@ Outputs:
   UserPoolId:
     Description: Authentication Cognito User Pool Id.
     Value: !GetAtt Authentication.Outputs.UserPoolId
-
+  
   UserPoolClientId:
     Description: Authentication Cognito User Pool Client Id.
     Value: !GetAtt Authentication.Outputs.UserPoolClientId
-
+  
   IdentityPoolId:
     Description: Authentication Cognito Identity Pool Id.
     Value: !GetAtt Authentication.Outputs.IdentityPoolId
@@ -270,7 +273,7 @@ Outputs:
   PinpointAppId:
     Description: Pinpoint App Id
     Value: !GetAtt Pinpoint.Outputs.PinpointAppId
-
+  
   PinpointSMSLongCode:
     Description: Pinpoint SMS Long code for two way SMS
     Value: !GetAtt SSMParameters.Outputs.ParameterPinpointSMSLongCode
@@ -279,11 +282,11 @@ Outputs:
     Description: DynamoDB Table for Products
     Value: !GetAtt Tables.Outputs.ProductsTable
 
-  CategoriesTable:
+  CategoriesTable: 
     Description: DynamoDB Table for Categories
     Value: !GetAtt Tables.Outputs.CategoriesTable
 
-  ExperimentStrategyTable:
+  ExperimentStrategyTable: 
     Description: DynamoDB Table for Experiments
     Value: !GetAtt Tables.Outputs.ExperimentStrategyTable
 
@@ -310,10 +313,6 @@ Outputs:
   ParameterSegmentWriteKey:
     Description: Segment write key Parameter
     Value: !GetAtt SSMParameters.Outputs.ParameterSegmentWriteKey
-
-  ParameterGoogleAnalyticsMeasurementId:
-    Description: Google Analytics Measurement Id Parameter
-    Value: !GetAtt SSMParameters.Outputs.ParameterGoogleAnalyticsMeasurementId
 
   WebUIBucketName:
     Description: S3 bucket for CloudFront distribution.
