@@ -124,13 +124,6 @@ Parameters:
     Type: String
     Description: Parent stack name
 
-  ECSLaunchType:
-    Type: String
-    AllowedValues:
-      - "EC2"
-      - "FARGATE"
-    Default: "FARGATE"
-
 Resources:
 
   ProductsService:
@@ -166,7 +159,6 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Sub ${ParentStackName}-${AWS::Region}
-        ECSLaunchType: !Ref ECSLaunchType
 
   UsersService:
     Type: AWS::CloudFormation::Stack
@@ -199,7 +191,6 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Sub ${ParentStackName}-${AWS::Region}
-        ECSLaunchType: !Ref ECSLaunchType
 
   CartsService:
     Type: AWS::CloudFormation::Stack
@@ -231,7 +222,6 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Sub ${ParentStackName}-${AWS::Region}
-        ECSLaunchType: !Ref ECSLaunchType
 
   OrdersService:
     Type: AWS::CloudFormation::Stack
@@ -263,7 +253,6 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Sub ${ParentStackName}-${AWS::Region}
-        ECSLaunchType: !Ref ECSLaunchType
 
   SearchService:
     Type: AWS::CloudFormation::Stack
@@ -296,7 +285,70 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Sub ${ParentStackName}-${AWS::Region}
-        ECSLaunchType: !Ref ECSLaunchType
+
+  LocationService:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${ResourceBucket}/${ResourceBucketRelativePath}cloudformation-templates/services/service/_template.yaml
+      Parameters:
+        ServiceName: location
+        ServicePath: src/location
+        ResourceBucket: !Ref ResourceBucket
+        ResourceBucketRelativePath: !Ref ResourceBucketRelativePath
+        SourceDeploymentType: !Ref SourceDeploymentType
+        GitHubRepo: !Ref GitHubRepo
+        GitHubBranch: !Ref GitHubBranch
+        GitHubToken: !Ref GitHubToken
+        GitHubUser: !Ref GitHubUser
+        UserPoolId: !Ref UserPoolId
+        UserPoolClientId: !Ref UserPoolClientId
+        IdentityPoolId: !Ref IdentityPoolId
+        StackBucketName: !Ref StackBucketName
+        Subnets: !Ref Subnets
+        VpcId: !Ref VpcId
+        ClusterName: !Ref ClusterName
+        ServiceDiscoveryNamespace: !Ref ServiceDiscoveryNamespace
+        EnvElasticsearchDomainEndpoint: !Ref EnvElasticsearchDomainEndpoint
+        ParameterPersonalizeEventTrackerId: !Ref ParameterPersonalizeEventTrackerId
+        ParameterAmplitudeApiKey: !Ref ParameterAmplitudeApiKey
+        ParameterOptimizelySdkKey: !Ref ParameterOptimizelySdkKey
+        CleanupBucketLambdaArn: !Ref CleanupBucketLambdaArn
+        DeleteRepositoryLambdaArn: !GetAtt DeleteRepositoryLambdaFunction.Arn
+        WebRootUrl: !Ref WebRootUrl
+        ImageRootUrl: !Ref ImageRootUrl
+        Uid: !Sub ${ParentStackName}-${AWS::Region}
+
+  OffersService:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${ResourceBucket}/${ResourceBucketRelativePath}cloudformation-templates/services/service/_template.yaml
+      Parameters:
+        ServiceName: offers
+        ServicePath: src/offers
+        ResourceBucket: !Ref ResourceBucket
+        ResourceBucketRelativePath: !Ref ResourceBucketRelativePath
+        SourceDeploymentType: !Ref SourceDeploymentType
+        GitHubRepo: !Ref GitHubRepo
+        GitHubBranch: !Ref GitHubBranch
+        GitHubToken: !Ref GitHubToken
+        GitHubUser: !Ref GitHubUser
+        UserPoolId: !Ref UserPoolId
+        UserPoolClientId: !Ref UserPoolClientId
+        IdentityPoolId: !Ref IdentityPoolId
+        StackBucketName: !Ref StackBucketName
+        Subnets: !Ref Subnets
+        VpcId: !Ref VpcId
+        ClusterName: !Ref ClusterName
+        ServiceDiscoveryNamespace: !Ref ServiceDiscoveryNamespace
+        EnvElasticsearchDomainEndpoint: !Ref EnvElasticsearchDomainEndpoint
+        ParameterPersonalizeEventTrackerId: !Ref ParameterPersonalizeEventTrackerId
+        ParameterAmplitudeApiKey: !Ref ParameterAmplitudeApiKey
+        ParameterOptimizelySdkKey: !Ref ParameterOptimizelySdkKey
+        CleanupBucketLambdaArn: !Ref CleanupBucketLambdaArn
+        DeleteRepositoryLambdaArn: !GetAtt DeleteRepositoryLambdaFunction.Arn
+        WebRootUrl: !Ref WebRootUrl
+        ImageRootUrl: !Ref ImageRootUrl
+        Uid: !Sub ${ParentStackName}-${AWS::Region}
 
   RecommendationsService:
     Type: AWS::CloudFormation::Stack
@@ -331,7 +383,6 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Sub ${ParentStackName}-${AWS::Region}
-        ECSLaunchType: !Ref ECSLaunchType
 
   VideosService:
     Type: AWS::CloudFormation::Stack
@@ -365,8 +416,7 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Sub ${ParentStackName}-${AWS::Region}
-        ECSLaunchType: !Ref ECSLaunchType
-
+ 
   # Pinpoint personalized messaging customization
   PinpointPersonalize:
     Type: AWS::CloudFormation::Stack
@@ -376,6 +426,8 @@ Resources:
         ResourceBucket: !Ref ResourceBucket
         ResourceBucketRelativePath: !Ref ResourceBucketRelativePath
         ProductsServiceDNSName: !GetAtt ProductsService.Outputs.ServiceDNSName
+        RecommendationsServiceDNSName: !GetAtt RecommendationsService.Outputs.ServiceDNSName
+        OffersServiceDNSName: !GetAtt OffersService.Outputs.ServiceDNSName
         PinpointAppId: !Ref PinpointAppId
         Uid: !Sub ${ParentStackName}-${AWS::Region}
 
@@ -483,7 +535,11 @@ Outputs:
     Description: Orders load balancer URL.
     Value: !GetAtt OrdersService.Outputs.ServiceUrl
 
-  RecommendationsServiceUrl: 
+  LocationServiceUrl:
+    Description: Location load balancer URL.
+    Value: !GetAtt LocationService.Outputs.ServiceUrl
+
+  RecommendationsServiceUrl:
     Description: Recommendations load balancer URL.
     Value: !GetAtt RecommendationsService.Outputs.ServiceUrl
 
@@ -495,9 +551,15 @@ Outputs:
     Description: Search load balancer URL.
     Value: !GetAtt SearchService.Outputs.ServiceUrl
 
+  OffersServiceUrl:
+    Description: Offers service load balancer URL.
+    Value: !GetAtt OffersService.Outputs.ServiceUrl
+
   PinpointPersonalizeRoleArn:
       Value: !GetAtt PinpointPersonalize.Outputs.PinpointPersonalizeRoleArn
 
   CustomizeRecommendationsFunctionArn:
       Value: !GetAtt PinpointPersonalize.Outputs.CustomizeRecommendationsFunctionArn
-    
+
+  CustomizeOffersRecommendationsFunctionArn:
+      Value: !GetAtt PinpointPersonalize.Outputs.CustomizeOffersRecommendationsFunctionArn

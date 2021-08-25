@@ -39,16 +39,25 @@ Metadata:
         Parameters:
           - UseDefaultIVSStreams
       - Label:
-          default: "AWS Partner Integrations"
+          default: "Create Location and Personalised Offers resources"
+        Parameters:
+          - DeployLocationServices
+          - DeployPersonalizedOffersCampaign
+      - Label:
+          default: "Amazon Pay (optional)"
+        Parameters:
+          - AmazonPayStoreId
+          - AmazonPayMerchantId
+          - AmazonPayPublicKeyId
+          - AmazonPayPrivateKey
+      - Label:
+          default: "Optional Integrations"
         Parameters:
           - AmplitudeApiKey
           - OptimizelySdkKey
+          - IncludeSegmentDependencies
           - SegmentWriteKey
-      - Label:
-          default: "ECS Deployment Options (optional)"
-        Parameters:
-          - ECSLaunchType
-          - ECSInstanceType
+          - GoogleAnalyticsMeasurementId
     ParameterLabels:
       ResourceBucket:
         default: "Deployment Resources Staging Bucket Name"
@@ -78,16 +87,29 @@ Metadata:
         default: "Reply-To name"
       UseDefaultIVSStreams:
         default: "Use default IVS streams"
+      DeployLocationServices:
+        default: "Deploy Location Services resources"
+      DeployPersonalizedOffersCampaign:
+        default: "Deploy personalized offers and pickup notices using Location Services geofencing."
       AmplitudeApiKey:
         default: "Amplitude API Key"
       OptimizelySdkKey:
         default: "Optimizely SDK Key"
+      AmazonPayStoreId:
+        default: "Store ID of Amazon Pay sandbox account"
+      AmazonPayMerchantId:
+        default: "Merchant ID of Amazon Pay sandbox account"
+      AmazonPayPublicKeyId:
+        default: "Public key ID associated with Amazon Pay sandbox account"
+      AmazonPayPrivateKey:
+        default: "Private key associated with Amazon Pay sandbox account"
+      IncludeSegmentDependencies:
+        default: "Deploy Segment Resources"
       SegmentWriteKey:
         default: "Segment Write Key"
-      ECSLaunchType:
-        default: "ECS deployment type"
-      ECSInstanceType:
-        default: "ECS instance type (if using EC2 backed ECS)"
+      GoogleAnalyticsMeasurementId:
+        default: "Google Analytics Measurement Id"
+
 Parameters:
   ResourceBucket:
     Type: String
@@ -216,28 +238,86 @@ Parameters:
     Description: Optimizely SDK key for experimentation (optional).
     NoEcho: true
 
-  SegmentWriteKey:
+  DeployLocationServices:
     Type: String
-    Description: Segment write key for real-time data collection (optional).
+    Description: Deploy any Location Resources
+    AllowedValues:
+      - 'Yes'
+      - 'No'
+    Default: 'Yes'
+
+  DeployPersonalizedOffersCampaign:
+    Type: String
+    Description: Deploy personalized offers and pickup notices using Location Services geofencing
+    AllowedValues:
+      - 'Yes'
+      - 'No'
+    Default: 'Yes'
+
+  AmazonPayPublicKeyId:
+    Type: String
+    Description: >
+      This demonstration store contains an example of signing Amazon Pay payloads for integration with an Amazon Pay sandbox.
+      This parameter is the Public Key ID for the Amazon Pay sandbox account being used.
+      For more information see "Amazon Pay Integration" under the README file in the amazon-pay-signing subfolder in the repository.
+
+  AmazonPayStoreId:
+    Type: String
+    Description: >
+    The Store ID of the Amazon Pay sandbox account being used.
+    For more information see "Amazon Pay Integration" under the README file in the amazon-pay-signing subfolder in the repository.
+
+  AmazonPayMerchantId:
+    Type: String
+    Description: >
+      Merchant ID of the Amazon Pay sandbox account being used.
+      For more information see "Amazon Pay Integration" under the README file in the amazon-pay-signing subfolder in the repository.
+
+  AmazonPayPrivateKey:
+    Type: String
+    Description: >
+      The private key to be used for signing Amazon Pay requests for a sandbox account.
+      You will need to copy the whole contents of the .pem file into this parameter.
+      For more information see "Amazon Pay Integration" under the README file in the amazon-pay-signing subfolder in the repository.
     NoEcho: true
 
-  ECSLaunchType:
+  IncludeSegmentDependencies:
     Type: String
-    Description: Choose if you want ECS to use Fargate or EC2 backed. If you're unsure, leave Fargate. You must select EC2 if you intend to use the service FIS for chaos engineering
+    Description: >
+      Whether to deploy the resources required for the Segment workshops.
     AllowedValues:
-      - "EC2"
-      - "FARGATE"
-    Default: "FARGATE"
+      - 'Yes'
+      - 'No'
+    Default: 'No'
 
-  ECSInstanceType:
+  SegmentWriteKey:
     Type: String
-    Default: m5.xlarge
-    Description: (only used if selecteced EC2 for ECS cluster) Class of EC2 instance used to host containers. Choose t2 for testing, m5 for general purpose, c5 for CPU intensive services, and r5 for memory intensive services
-    AllowedValues: [ t2.micro, t2.small, t2.medium, t2.large, t2.xlarge, t2.2xlarge,
-     m5.large, m5.xlarge, m5.2xlarge, m5.4xlarge, m5.12xlarge, m5.24xlarge,
-     c5.large, c5.xlarge, c5.2xlarge, c5.4xlarge, c5.9xlarge, c5.18xlarge,
-     r5.large, r5.xlarge, r5.2xlarge, r5.4xlarge, r5.12xlarge, r5.24xlarge ]
-    ConstraintDescription: Please choose a valid instance type.
+    Description: >
+      Segment write key for real-time data collection (optional). Be sure the Segment resources are deployed (above) if you specify a write key.
+    NoEcho: true
+
+  GoogleAnalyticsMeasurementId:
+    Type: String
+    Description: >
+      Google Analytics Measurement Identifier (optional). If specified, the Google Analytics integration in the web application is activated and
+      events are sent to the data stream associated with the Measurement ID.
+
+Conditions:
+  DeploySegmentResources: !Equals
+    - !Ref IncludeSegmentDependencies
+    - 'Yes'
+
+  DeployLocationStack: !Equals
+    - !Ref DeployLocationServices
+    - 'Yes'
+
+  CreateAmazonPayResources: !And
+    - !And
+      - !Not [ !Equals [ !Ref AmazonPayPrivateKey, "" ] ]
+      - !Not [ !Equals [ !Ref AmazonPayStoreId, "" ] ]
+    - !And
+      - !Not [ !Equals [ !Ref AmazonPayMerchantId, "" ] ]
+      - !Not [ !Equals [ !Ref AmazonPayPublicKeyId, "" ] ]
 
 Resources:
   # Base Resources
@@ -256,8 +336,8 @@ Resources:
         OptimizelySdkKey: !Ref OptimizelySdkKey
         SegmentWriteKey: !Ref SegmentWriteKey
         PinpointSMSLongCode: !Ref PinpointSMSLongCode
-        ECSLaunchType: !Ref ECSLaunchType
-        ECSInstanceType: !Ref ECSInstanceType
+        GoogleAnalyticsMeasurementId: !Ref GoogleAnalyticsMeasurementId
+        LocationResourcePrefix: !Ref AWS::StackName
 
   # Services Resources
   Services:
@@ -296,7 +376,6 @@ Resources:
           - '${RootURL}/images/'
           - RootURL: !GetAtt Base.Outputs.WebUICDNURL
         ParentStackName: !Ref AWS::StackName
-        ECSLaunchType: !Ref ECSLaunchType
 
   # Web UI Pipeline
   WebUIPipeline:
@@ -311,6 +390,9 @@ Resources:
         GitHubBranch: !Ref GitHubBranch
         GitHubToken: !Ref GitHubToken
         GitHubUser: !Ref GitHubUser
+        AmazonPayMerchantId: !Ref AmazonPayMerchantId
+        AmazonPayPublicKeyId: !Ref AmazonPayPublicKeyId
+        AmazonPayStoreId: !Ref AmazonPayStoreId
         UserPoolId: !GetAtt Base.Outputs.UserPoolId
         UserPoolClientId: !GetAtt Base.Outputs.UserPoolClientId
         IdentityPoolId: !GetAtt Base.Outputs.IdentityPoolId
@@ -321,11 +403,16 @@ Resources:
         RecommendationsServiceExternalUrl: !GetAtt Services.Outputs.RecommendationsServiceUrl
         SearchServiceExternalUrl: !GetAtt Services.Outputs.SearchServiceUrl
         VideosServiceExternalUrl: !GetAtt Services.Outputs.VideosServiceUrl
+        LocationServiceExternalUrl: !GetAtt Services.Outputs.LocationServiceUrl
+        OffersServiceExternalUrl: !GetAtt Services.Outputs.OffersServiceUrl
         PinpointAppId: !GetAtt Base.Outputs.PinpointAppId
         ParameterPersonalizeEventTrackerId: !GetAtt Base.Outputs.ParameterPersonalizeEventTrackerId
+        LocationResourceName: !If [DeployLocationStack, !GetAtt Location.Outputs.LocationResourceName, "NotDeployed"]
+        LocationNotificationEndpoint: !If [DeployLocationStack, !GetAtt Location.Outputs.LocationNotificationEndpoint, "NotDeployed"]
         ParameterAmplitudeApiKey: !GetAtt Base.Outputs.ParameterAmplitudeApiKey
         ParameterOptimizelySdkKey: !GetAtt Base.Outputs.ParameterOptimizelySdkKey
         ParameterSegmentWriteKey: !GetAtt Base.Outputs.ParameterSegmentWriteKey
+        ParameterGoogleAnalyticsMeasurementId: !GetAtt Base.Outputs.ParameterGoogleAnalyticsMeasurementId
         CleanupBucketLambdaArn: !GetAtt CleanupBucket.Outputs.LambdaFunctionArn
         WebUICDN: !GetAtt Base.Outputs.WebUICDN
         WebUIBucketName: !GetAtt Base.Outputs.WebUIBucketName
@@ -344,6 +431,39 @@ Resources:
         ResourceBucketRelativePath: !Ref ResourceBucketRelativePath
         UsersServiceExternalUrl: !GetAtt Services.Outputs.UsersServiceUrl
         RecommendationsServiceExternalUrl: !GetAtt Services.Outputs.RecommendationsServiceUrl
+
+  # Amazon Location Resources
+  Location:
+    Type: AWS::CloudFormation::Stack
+    Condition: DeployLocationStack
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${ResourceBucket}/${ResourceBucketRelativePath}cloudformation-templates/location.yaml
+      Parameters:
+        ResourceBucket: !Ref ResourceBucket
+        ResourceBucketRelativePath: !Ref ResourceBucketRelativePath
+        UserPoolId: !GetAtt Base.Outputs.UserPoolId
+        DeployDefaultGeofence: !Ref DeployPersonalizedOffersCampaign
+        PinpointAppId: !GetAtt Base.Outputs.PinpointAppId
+        PinpointEmailFromAddress: !Ref PinpointEmailFromAddress
+        ProductsServiceExternalUrl: !GetAtt Services.Outputs.ProductsServiceUrl
+        CartsServiceExternalUrl: !GetAtt Services.Outputs.CartsServiceUrl
+        OrdersServiceExternalUrl: !GetAtt Services.Outputs.OrdersServiceUrl
+        OffersServiceExternalUrl: !GetAtt Services.Outputs.OffersServiceUrl
+        UsersServiceExternalUrl: !GetAtt Services.Outputs.UsersServiceUrl
+        WebURL: !GetAtt Base.Outputs.WebUICDNURL
+
+  AmazonPay:
+    Type: AWS::CloudFormation::Stack
+    Condition: CreateAmazonPayResources
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${ResourceBucket}/${ResourceBucketRelativePath}cloudformation-templates/amazonpay.yaml
+      Parameters:
+        ResourceBucket: !Ref ResourceBucket
+        ResourceBucketRelativePath: !Ref ResourceBucketRelativePath
+        AmazonPayPublicKeyId: !Ref AmazonPayPublicKeyId
+        AmazonPayStoreId: !Ref AmazonPayStoreId
+        AmazonPayPrivateKey: !Ref AmazonPayPrivateKey
+        WebURL: !GetAtt Base.Outputs.WebUICDNURL
 
   # Deployment support
   DeploymentSupport:
@@ -367,9 +487,11 @@ Resources:
         PinpointAppId: !GetAtt Base.Outputs.PinpointAppId
         PinpointPersonalizeRoleArn: !GetAtt Services.Outputs.PinpointPersonalizeRoleArn
         CustomizeRecommendationsFunctionArn: !GetAtt Services.Outputs.CustomizeRecommendationsFunctionArn
+        CustomizeOffersRecommendationsFunctionArn: !GetAtt Services.Outputs.CustomizeOffersRecommendationsFunctionArn
         PinpointEmailFromAddress: !Ref PinpointEmailFromAddress
         PinpointEmailFromName: !Ref PinpointEmailFromName
         UseDefaultIVSStreams: !Ref UseDefaultIVSStreams
+        DeployPersonalizedOffersCampaign: !Ref DeployPersonalizedOffersCampaign
 
   # Cleanup bucket function
   CleanupBucket:
@@ -377,8 +499,9 @@ Resources:
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${ResourceBucket}/${ResourceBucketRelativePath}cloudformation-templates/cleanup-bucket.yaml
 
-  # Segment Lambda Function
+  # Segment Lambda Functions and Roles
   SegmentPersonalize:
+    Condition: DeploySegmentResources
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${ResourceBucket}/${ResourceBucketRelativePath}cloudformation-templates/segment.yaml

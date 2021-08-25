@@ -151,6 +151,14 @@ Parameters:
     Type: String
     Default: 80
 
+  EnvOffersServiceInternalUrl:
+    Type: String
+    Default: offers.retaildemostore.local
+
+  EnvOffersServiceInternalPort:
+    Type: String
+    Default: 80
+
   EnvElasticsearchDomainEndpoint:
     Type: String
     Default: none
@@ -202,13 +210,6 @@ Parameters:
   Uid:
     Type: String
 
-  ECSLaunchType:
-    Type: String
-    AllowedValues:
-      - "EC2"
-      - "FARGATE"
-    Default: "FARGATE"
-
 Resources:
 
   Loadbalancer:
@@ -237,7 +238,7 @@ Resources:
         UserPoolClientId: !Ref UserPoolClientId
         IdentityPoolId: !Ref IdentityPoolId
         StackBucketName: !Ref StackBucketName
-        ECSServiceName: !GetAtt Service.Outputs.ECSServiceName
+        FargateServiceName: !GetAtt Service.Outputs.FargateServiceName
         ProductsServiceExternalUrl: !Ref ProductsServiceExternalUrl
         UsersServiceExternalUrl: !Ref UsersServiceExternalUrl
         CartsServiceExternalUrl: !Ref CartsServiceExternalUrl
@@ -278,6 +279,8 @@ Resources:
         EnvUsersServiceInternalPort: !Ref EnvUsersServiceInternalPort
         EnvSearchServiceInternalUrl: !Ref EnvSearchServiceInternalUrl
         EnvSerchServiceInternalPort: !Ref EnvSerchServiceInternalPort
+        EnvOffersServiceInternalUrl: !Ref EnvOffersServiceInternalUrl
+        EnvOffersServiceInternalPort: !Ref EnvOffersServiceInternalPort
         EnvElasticsearchDomainEndpoint: !Ref EnvElasticsearchDomainEndpoint
         ResourceBucket: !Ref ResourceBucket
         ParameterIVSVideoChannelMap: !Ref ParameterIVSVideoChannelMap
@@ -289,8 +292,7 @@ Resources:
         WebRootUrl: !Ref WebRootUrl
         ImageRootUrl: !Ref ImageRootUrl
         Uid: !Ref Uid
-        ECSLaunchType: !Ref ECSLaunchType
-       
+        
 Outputs:
   ServiceDNSName:
     Description: DNS name of the load balancer for this service

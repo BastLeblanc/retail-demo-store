@@ -48,7 +48,7 @@ Parameters:
   StackBucketName:
     Type: String
 
-  ECSServiceName:
+  FargateServiceName:
     Type: String
 
   ProductsServiceExternalUrl:
@@ -245,7 +245,7 @@ Resources:
                   - ecs:List*
                   - ecs:Describe*
                   - ecs:RegisterTaskDefinition
-              - Resource: !Sub 'arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:service/${ClusterName}/${ECSServiceName}'
+              - Resource: !Sub 'arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:service/${ClusterName}/${FargateServiceName}'
                 Effect: Allow
                 Action:
                   - ecs:UpdateService
@@ -376,7 +376,7 @@ Resources:
                 Provider: ECS
               Configuration:
                 ClusterName: !Ref ClusterName
-                ServiceName: !Ref ECSServiceName
+                ServiceName: !Ref FargateServiceName
                 FileName: images.json
               InputArtifacts:
                 - Name: BuildOutput
@@ -435,7 +435,7 @@ Resources:
                 Provider: ECS
               Configuration:
                 ClusterName: !Ref ClusterName
-                ServiceName: !Ref ECSServiceName
+                ServiceName: !Ref FargateServiceName
                 FileName: images.json
               InputArtifacts:
                 - Name: BuildOutput
