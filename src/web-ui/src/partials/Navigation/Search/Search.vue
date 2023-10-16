@@ -165,7 +165,7 @@ export default {
 
 <style scoped>
 .search-results {
-  width: 250px;
+  width: 450px;
 }
 
 .fa-search {
