@@ -18,7 +18,7 @@
     "layer0:update": "npm i -D @layer0/cli@latest && npm i @layer0/core@latest @layer0/prefetch@latest @layer0/devtools@latest"
   },
   "dependencies": {
-    "@aws-amplify/ui-vue": "^3.1.21",
+    "@aws-amplify/ui-vue": "^4.0.4",
     "@mparticle/web-sdk": "^2.23.2",
     "@optimizely/optimizely-sdk": "^4.9.2",
     "amplitude-js": "^5.8.0",
