@@ -38,7 +38,7 @@
     "vue-router": "^4.2.4",
     "vuex": "^4.1.0",
     "vuex-persistedstate": "^4.1.0",
-    "workbox-webpack-plugin": "^6.5.4"
+    "workbox-webpack-plugin": "^7.1.0"
   },
   "devDependencies": {
     "@layer0/cli": "^4.19.7",
