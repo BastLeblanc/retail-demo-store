@@ -35,7 +35,7 @@ If not: ```sudo apt install python3```
 
 ## Install Git and clone repo:
 ```
-sudo apt install git
+sudo apt install git 
 mkdir RetailDemoStore
 cd RetailDemoStore/
 git clone https://github.com/aws-samples/retail-demo-store
@@ -43,15 +43,6 @@ git clone https://github.com/aws-samples/retail-demo-store
 
 !!! Note
     If you plan to customize the demo, we recommend using your fork
-
-## Install and configure the AWS CLI:
-
-```
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip
-sudo ./aws/install
-aws configure
-```
 
 ## Packages required for building staging:
 
@@ -62,6 +53,17 @@ sudo apt install python3.12-venv
 sudo apt install nodejs
 sudo apt install npm
 ```
+
+## Install and configure the AWS CLI:
+
+```
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+aws configure
+```
+
+
 
 ## (optional) Fork this Repo
 
@@ -85,6 +87,9 @@ We recommend to create a dedicated bucket for deployment.
 ### Bucket Permissions
 
 The default stage script requires the ability to set the resources it uploads to your bucket as public read.  Note that you do not need to set the bucket up to allow public listing of the resources in the bucket (this is not recommended).
+
+!!!! Note:
+    enable versioning on the S3 bucket (for codepipeline)
 
 If you plan to enable the automated Personalize campaign creation process at deployment time, you must allow access for Amazon Personalize to your bucket. Add the following bucket policy to your staging bucket.
 
