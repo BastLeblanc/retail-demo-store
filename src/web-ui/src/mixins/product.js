@@ -7,6 +7,7 @@ import { RepositoryFactory } from '@/repositories/RepositoryFactory';
 import { AnalyticsHandler } from '@/analytics/AnalyticsHandler';
 import { capitalize } from '@/util/capitalize';
 import { getProductImageUrl } from '../util/getProductImageUrl';
+import { getProductVideoUrl } from '../util/getProductImageUrl';
 
 const ProductsRepository = RepositoryFactory.get('products');
 
@@ -22,6 +23,11 @@ export const product = {
       if (!this.product) return null;
 
       return getProductImageUrl(this.product);
+    },
+    productVideoUrl() {
+    if (!this.product) return null;
+
+    return getProductVideoUrl(this.product);
     },
     readableProductCategory() {
       if (!this.product) return null;

@@ -65,7 +65,12 @@
           </div>
 
           <div class="product-img">
-            <img :src="productImageUrl" class="img-fluid" :alt="product.name" />
+            <img
+              v-if="!product.video"
+             :src="productImageUrl" class="img-fluid" :alt="product.name" />
+            <video autoplay muted loop
+              v-if="product.video"
+              :src="productVideoUrl" class="img-fluid" :alt="product.name" />
           </div>
         </main>
 

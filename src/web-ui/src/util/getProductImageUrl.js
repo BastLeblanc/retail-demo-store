@@ -5,3 +5,11 @@ export const getProductImageUrl = (product) => {
 
   return `${import.meta.env.VITE_IMAGE_ROOT_URL}${product.category}/${product.image}`;
 };
+
+export const getProductVideoUrl = (product) => {
+  if (!product.video) return `${import.meta.env.VITE_IMAGE_ROOT_URL}/product_image_coming_soon.png`;
+
+  if (product.video.includes('://')) return product.video;
+
+  return `${import.meta.env.VITE_IMAGE_ROOT_URL}${product.category}/${product.video}`;
+};
