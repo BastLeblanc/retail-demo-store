@@ -70,7 +70,7 @@
              :src="productImageUrl" class="img-fluid" :alt="product.name" />
             <video autoplay muted loop
               v-if="product.video"
-              :src="productVideoUrl" class="img-fluid" :alt="product.name" />
+              :src="productVideoUrl" :alt="product.name" />
           </div>
         </main>
 
