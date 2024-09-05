@@ -40,7 +40,7 @@ export default {
 
 <style scoped>
 .cart {
-  width: 40px;
+  width: 140px;
 }
 
 .icon {

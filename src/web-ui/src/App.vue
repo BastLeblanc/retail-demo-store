@@ -55,7 +55,7 @@ export default {
 }
 
 :root {
-  font-size: 18px;
+  font-size: 48px;
 }
 
 body {

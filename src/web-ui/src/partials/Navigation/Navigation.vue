@@ -90,7 +90,7 @@ export default {
 
 @media (min-width: 992px) {
   .logo {
-    width: 120px;
+    width: 320px;
   }
 
   .search {

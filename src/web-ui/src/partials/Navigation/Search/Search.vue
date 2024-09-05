@@ -201,7 +201,7 @@ export default {
 
 @media (min-width: 992px) {
   .input {
-    width: 250px;
+    width: 800px;
   }
 }
 </style>

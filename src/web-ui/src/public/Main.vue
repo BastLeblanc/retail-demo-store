@@ -233,7 +233,7 @@ export default {
 .user-recommendations {
   display: grid;
   grid-gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(650px, 1fr));
 }
 
 @media (min-width: 768px) {
@@ -242,7 +242,7 @@ export default {
   }
 
   .user-recommendations {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(650px, 1fr));
   }
 }
 </style>

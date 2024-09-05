@@ -118,12 +118,12 @@ export default {
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
-  max-width: 400px;
+/* 4k resolution  max-width: 400px; */
 }
 
 @media (min-width: 992px) {
   .layout--has-nav {
-    padding-top: 150px;
+    padding-top: 400px;
   }
 }
 </style>

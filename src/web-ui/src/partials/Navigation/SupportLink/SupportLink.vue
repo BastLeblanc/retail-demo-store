@@ -13,7 +13,7 @@ export default {
 
 <style>
 .support {
-  width: 40px;
+  width: 140px;
 }
 
 .icon {
