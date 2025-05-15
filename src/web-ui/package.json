@@ -35,7 +35,7 @@
     "sweetalert": "^2.1.2",
     "uuid": "^9.0.0",
     "vite-plugin-html": "^3.2.0",
-    "vue": "^3.3.4",
+    "vue": "^3.5.14",
     "vue-advanced-cropper": "^2.8.8",
     "vue-agile": "^2.0.0",
     "vue-gtag": "^2.0.1",
